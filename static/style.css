@@ -28,9 +28,12 @@ body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",
 .card{background:var(--card);border:1px solid var(--border);padding:14px;border-radius:10px;box-shadow:0 1px 0 rgba(16,24,40,0.02)}
 .card-title{margin:0 0 8px;font-size:1rem}
 .card-meta{font-size:0.9rem;color:var(--muted);margin-bottom:12px}
-.card-actions{display:flex;gap:8px}
+.card-actions{display:flex;gap:8px;flex-direction:column}
 .btn-link{color:var(--accent);text-decoration:none;font-weight:600}
 .btn-link:hover{text-decoration:underline}
+.alt-sources{margin-top:8px}
+.alt-link{display:inline-block;margin-right:8px;color:#5b6b6a;font-size:0.85rem;text-decoration:none}
+.alt-link:hover{text-decoration:underline}
 
 .pagination{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
 .p-left, .p-right{min-height:36px}
