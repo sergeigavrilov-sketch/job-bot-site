@@ -35,8 +35,6 @@ def parse_jobs_from_page(html):
     return jobs, soup
 
 def page_has_next(soup, page):
-    # ищем ссылку на следующую страницу в пагинации
-    # стандартная форма: ...&sivu=N
     next_num = page + 1
     for a in soup.select(".pagination a"):
         href = a.get("href", "")
@@ -46,10 +44,10 @@ def page_has_next(soup, page):
 
 @app.route("/", methods=["GET"])
 def index():
-    # параметры формы
     haku = request.args.get("haku", "").strip()
     alue = request.args.get("alue", "").strip()
     page = request.args.get("page", "1")
+    
     try:
         page_num = max(1, int(page))
     except ValueError:
@@ -59,27 +57,36 @@ def index():
     has_next = False
     error = None
 
-    if haku:
-        # кодируем параметры и формируем URL для конкретной страницы
-        encoded_haku = quote(haku)
+    # выполнять поиск если указано хотя бы одно поле
+    if haku or alue:
+        encoded_haku = quote(haku) if haku else ""
         encoded_alue = quote(alue) if alue else ""
-        url = f"{BASE_URL}/tyopaikat?haku={encoded_haku}"
-        if encoded_alue:
-            url += f"&alue={encoded_alue}"
-        url += f"&sivu={page_num}"
+
+        # Формируем корректный URL на основе введённых значений
+        if encoded_alue and not encoded_haku:
+            # Только город
+            url = f"{BASE_URL}/tyopaikat/alue/{encoded_alue}?sivu={page_num}"
+        else:
+            # По профессии или по профессии + городу
+            url = f"{BASE_URL}/tyopaikat?"
+            if encoded_haku:
+                url += f"haku={encoded_haku}"
+            if encoded_alue:
+                url += f"&alue={encoded_alue}"
+            url += f"&sivu={page_num}"
 
         app.logger.info("Fetching: %s", url)
+
         try:
             resp = requests.get(url, headers=HEADERS, timeout=12)
             resp.raise_for_status()
             jobs, soup = parse_jobs_from_page(resp.text)
             has_next = page_has_next(soup, page_num)
-            # небольшая задержка — чтобы не создавать нагрузку
             time.sleep(0.4)
         except requests.RequestException as e:
             app.logger.error("Request error: %s", e)
             error = "Haun suorittamisessa tapahtui virhe. Yritä hetken päästä."
-    # render page
+
     return render_template(
         "index.html",
         haku=haku,
@@ -91,4 +98,4 @@ def index():
     )
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(host="0.0.0.0", port=10000) 
