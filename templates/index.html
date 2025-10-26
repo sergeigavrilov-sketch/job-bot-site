@@ -9,13 +9,16 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <h1>Job Finder</h1>
-      <p class="subtitle">Hae työpaikkoja Duunitorista ja TE-palveluista</p>
+      <!-- HEADER LINK: сброс поиска -->
+      <a class="brand-link" href="/">
+        <h1>Job Finder</h1>
+      </a>
+      <p class="subtitle">Hae työpaikkoja Duunitorista ja Työmarkkinatorilta</p>
     </div>
   </header>
 
   <main class="container">
-    <form method="get" class="search-form" autocomplete="off">
+    <form id="search-form" method="get" class="search-form" autocomplete="off">
       <div class="form-row">
         <label for="haku">Työtehtävä</label>
         <input id="haku" name="haku" value="{{ haku }}" placeholder="esim. sähköasentaja">
@@ -47,25 +50,23 @@
       <div class="error">{{ error }}</div>
     {% endif %}
 
-    {% if jobs %}
-      <section class="results">
+    <section id="results-section">
+      {% if jobs %}
         <div class="results-header">
           <h2>Tulokset (sivu {{ page }})</h2>
         </div>
 
-        <div class="cards">
+        <div id="cards" class="cards">
           {% for job in jobs %}
             <article class="card">
               <h3 class="card-title">{{ job.title }}</h3>
               <div class="card-meta">
                 <span class="company">{{ job.company }}</span>
                 <span class="city">• {{ job.city }}</span>
-                <span class="source"> • Lähde: {{ job.source }}</span>
+                <span class="source"> • {{ job.source }}</span>
               </div>
-
               <div class="card-actions">
                 <a class="btn-link" href="{{ job.link }}" target="_blank" rel="nofollow">Näytä ilmoitus</a>
-
                 {% if job.alt_sources %}
                   <div class="alt-sources">
                     {% for alt in job.alt_sources %}
@@ -78,32 +79,26 @@
           {% endfor %}
         </div>
 
-        <div class="pagination">
-          <div class="p-left">
-            {% if has_prev %}
-              <a href="?haku={{ haku | urlencode }}&alue={{ alue | urlencode }}&page={{ page - 1 }}" class="btn">Edellinen</a>
-            {% endif %}
-          </div>
-          <div class="p-right">
-            {% if has_next %}
-              <a href="?haku={{ haku | urlencode }}&alue={{ alue | urlencode }}&page={{ page + 1 }}" class="btn">Seuraava</a>
-            {% endif %}
-          </div>
+        <div id="load-more-wrap" style="margin-top:18px;text-align:center;">
+          {% if has_next %}
+            <button id="load-more" class="btn-wide" data-page="{{ page + 1 }}">Näytä lisää</button>
+          {% endif %}
         </div>
-
-      </section>
-    {% else %}
-      {% if haku or alue %}
-        <p class="no-results">Ei tuloksia tällä sivulla.</p>
+      {% else %}
+        {% if haku or alue %}
+          <p class="no-results">Ei tuloksia tällä sivulla.</p>
+        {% endif %}
       {% endif %}
-    {% endif %}
+    </section>
 
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <small>Job Finder — kerää tietoja Duunitorista ja TE-palveluista. Ei virallinen Duunitori.</small>
+      <small>Job Finder — kerää tietoja Duunitorista ja Työmarkkinatorilta. Ei virallinen Duunitori.</small>
     </div>
   </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-  </html> 
+</html>
